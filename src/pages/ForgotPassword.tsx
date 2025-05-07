@@ -59,7 +59,7 @@ function ForgotPassword() {
             <div className="relative w-full max-w-md p-8 bg-white rounded-lg shadow-md">
                 <button
                     onClick={() => navigate('/')}
-                    className="absolute top-4 left-4 text-sm text-blue-500 hover:underline"
+                    className="absolute top-4 left-4 text-sm text-blue-500 hover:underline cursor-pointer"
                 >
                     ← Back
                 </button>

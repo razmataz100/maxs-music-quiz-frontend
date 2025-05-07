@@ -1,15 +1,9 @@
 import { API_BASE_URL } from "../config/apiConfig";
+import {CreateGameRequest, GameWithHighScore} from "../types/game.ts";
 
-interface GameJoinResponse {
-    gameId: number;
-    status: string;
-    joinCode: string;
-    userId: number;
-}
 
 async function handleApiResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
-        // Clone the response before trying to read it
         const responseClone = response.clone();
         let errorMessage = 'Something went wrong, please try again.';
 
@@ -17,12 +11,11 @@ async function handleApiResponse<T>(response: Response): Promise<T> {
             const errorData = await responseClone.json();
             errorMessage = errorData.message || errorMessage;
         } catch {
-            // If JSON parsing fails, try to get text
             try {
                 const errorText = await response.text();
                 errorMessage = errorText || errorMessage;
             } catch {
-                // Use default error message
+                errorMessage = 'An unknown error occurred.';
             }
         }
 
@@ -32,24 +25,8 @@ async function handleApiResponse<T>(response: Response): Promise<T> {
     return await response.json();
 }
 
-export async function joinGame(joinCode: string, authToken: string): Promise<GameJoinResponse> {
-    console.log('Making request to:', `${API_BASE_URL}/game/join/${joinCode}`);
-
-    const response = await fetch(`${API_BASE_URL}/game/join/${joinCode}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}`,
-        },
-    });
-
-    return handleApiResponse<GameJoinResponse>(response);
-}
-
-export async function leaveGame(joinCode: string, authToken: string): Promise<void> {
-    console.log('Making request to:', `${API_BASE_URL}/game/leave/${joinCode}`);
-
-    const response = await fetch(`${API_BASE_URL}/game/leave/${joinCode}`, {
+export async function startGame(gameId: number, authToken: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/game/${gameId}/start-game`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -59,3 +36,59 @@ export async function leaveGame(joinCode: string, authToken: string): Promise<vo
 
     return handleApiResponse(response);
 }
+
+export async function getAllGames(userId: number, authToken: string): Promise<GameWithHighScore[]> {
+    const response = await fetch(`${API_BASE_URL}/game/all/${userId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`,
+        },
+    });
+
+    return handleApiResponse<GameWithHighScore[]>(response);
+}
+
+export async function endGame(gameId: number, userId: number, correctAnswers: number, questionsAnswered: number, authToken: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/game/${gameId}/end-game`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+            userId: userId,
+            correctAnswers: correctAnswers,
+            questionsAnswered: questionsAnswered,
+        }),
+    });
+
+    return handleApiResponse(response);
+}
+
+export async function createGame(request: CreateGameRequest, authToken: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/game/create`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`,
+        },
+        body: JSON.stringify(request),
+    });
+
+    return handleApiResponse(response);
+}
+
+export async function deleteGame(gameId: number, authToken: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/game/${gameId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`,
+        },
+    });
+
+    return handleApiResponse(response);
+}
+
+

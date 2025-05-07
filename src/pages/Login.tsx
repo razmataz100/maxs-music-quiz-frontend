@@ -27,6 +27,7 @@ function Login({ onLoginSuccess }: { onLoginSuccess: () => void }) {
             localStorage.setItem('tokenExpiration', response.expiration);
             localStorage.setItem('username', response.username);
             localStorage.setItem('userId', response.userId.toString());
+            localStorage.setItem('userRole', response.userRole);
 
             onLoginSuccess();
         } catch (err) {
@@ -43,7 +44,7 @@ function Login({ onLoginSuccess }: { onLoginSuccess: () => void }) {
 
     return (
         <div className="flex items-center justify-center bg-gray-100">
-            <div className="w-full max-w-md p-8 bg-white rounded shadow-md">
+            <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
                 <h1 className="mb-6 text-2xl font-bold text-center text-gray-800">Login</h1>
                 {error && (
                     <div className="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-md">

@@ -51,7 +51,7 @@ function Register() {
         <div className="flex items-center justify-center bg-gray-100">
             <div className="relative w-full max-w-md p-8 bg-white rounded shadow-md">
                 <button
-                    className="absolute top-4 left-4 text-blue-600 hover:underline cursor-pointer"
+                    className="absolute top-4 right-4 text-blue-600 hover:underline cursor-pointer"
                     onClick={() => navigate(-1)}
                 >
                     &#8592; Back
