@@ -1,27 +1,28 @@
-import {BrowserRouter as Router, Routes, Route, useNavigate, useLocation} from 'react-router-dom';
+import {BrowserRouter as Router, Routes, Route, useNavigate} from 'react-router-dom';
 import AppLayout from './layouts/AppLayout';
 import Login from './pages/Login';
-import Profile from './pages/Profile';
+import Home from './pages/Home.tsx';
 import Register from "./pages/Register.tsx";
 import ForgotPassword from "./pages/ForgotPassword.tsx";
-import JoinGame from "./pages/JoinGame.tsx";
-import Lobby from "./pages/Lobby.tsx";
+import Quiz from "./pages/Quiz.tsx";
+import CreateQuiz from './pages/CreateQuiz.tsx';
+import Profile from "./pages/Profile.tsx";
+import Leaderboard from "./pages/Leaderboard.tsx";
 
 function DebugRoutes() {
-    const location = useLocation();
-    console.log('Current location:', location.pathname);
-
     return (
         <Routes>
             <Route
                 path="/"
                 element={<LoginWithNavigation />}
             />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/join-game" element={<JoinGame />} />
-            <Route path="/lobby/:joinCode" element={<Lobby />} />
+            <Route path="/game/:gameId" element={<Quiz />} />
+            <Route path="/create-quiz" element={<CreateQuiz />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
         </Routes>
     );
 }
@@ -40,7 +41,7 @@ function LoginWithNavigation() {
     const navigate = useNavigate();
 
     const handleLoginSuccess = () => {
-        navigate('/profile');
+        navigate('/home');
     };
 
     return <Login onLoginSuccess={handleLoginSuccess} />;
