@@ -46,12 +46,11 @@ function Register() {
         e.preventDefault();
         handleRegister();
     };
-
     return (
-        <div className="flex items-center justify-center bg-gray-100">
-            <div className="relative w-full max-w-md p-8 bg-white rounded shadow-md">
+        <div className="flex items-center justify-center bg-gray-50">
+            <div className="relative w-full max-w-md p-8 bg-white rounded-lg shadow-md border border-gray-200">
                 <button
-                    className="absolute top-4 right-4 text-blue-600 hover:underline cursor-pointer"
+                    className="absolute top-4 right-4 text-indigo-600 hover:text-indigo-800 transition-colors cursor-pointer"
                     onClick={() => navigate(-1)}
                 >
                     &#8592; Back
@@ -60,13 +59,13 @@ function Register() {
                 <h1 className="mb-6 text-2xl font-bold text-center text-gray-800">Register</h1>
 
                 {error && (
-                    <div className="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-md">
+                    <div className="p-3 mb-4 text-sm text-red-700 bg-red-50 rounded-md">
                         {error}
                     </div>
                 )}
 
                 {successMessage && (
-                    <div className="p-3 mb-4 text-sm text-green-700 bg-green-100 rounded-md">
+                    <div className="p-3 mb-4 text-sm text-green-700 bg-green-50 rounded-md">
                         {successMessage}
                     </div>
                 )}
@@ -83,7 +82,7 @@ function Register() {
                             placeholder="Enter your username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             disabled={isLoading}
                             autoComplete="off"
                         />
@@ -99,7 +98,7 @@ function Register() {
                             placeholder="Enter your email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             disabled={isLoading}
                             autoComplete="off"
                         />
@@ -115,14 +114,14 @@ function Register() {
                             placeholder="Enter your password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             disabled={isLoading}
                             autoComplete="new-password"
                         />
                     </div>
                     <button
                         type="submit"
-                        className="w-full px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                         disabled={isLoading}
                     >
                         {isLoading ? 'Registering...' : 'Register'}

@@ -2,6 +2,13 @@ import { useEffect, useState, useRef } from 'react';
 import { getUserInfo, updateUserInfo, uploadProfilePicture, getProfilePictureUrl } from '../httpUtils/user';
 import {User} from "../types/user.ts";
 import { useNavigate } from 'react-router-dom';
+import BackButton from "../components/BackButton.tsx";
+import {FormInput} from "../components/FormInput.tsx";
+import {StatCard} from "../components/StatCard.tsx";
+import {ProfilePicture} from "../components/ProfilePicture.tsx";
+import {Button} from "../components/Button.tsx";
+import {StatusMessage} from "../components/StatusMessage.tsx";
+import {LoadingSpinner} from "../components/LoadingSpinner.tsx";
 
 
 function Profile() {
@@ -98,62 +105,29 @@ function Profile() {
         }
     }
 
-    if (loading) return <div className="flex justify-center items-center p-8">Loading...</div>;
-    if (error) return <div className="text-red-500 p-8">Error: {error}</div>;
+    if (loading) return <LoadingSpinner fullPage size="large" />;
+    if (error) return (
+        <div className="p-8">
+            <StatusMessage type="error" message={error} />
+        </div>
+    );
     if (!userInfo) return <div className="p-8">No user information available</div>;
 
     return (
-        <div className="relative p-8 bg-white border border-gray-300 shadow-md w-full max-w-4xl mx-auto mt-8">
+        <div
+            className="relative p-8 bg-white border border-gray-200 shadow-md w-full max-w-4xl mx-auto mt-8 rounded-lg">
             <div className="relative flex justify-center items-center mb-6">
-                <h1 className="text-2xl font-bold">User Profile</h1>
-                <button
-                    onClick={() => navigate('/home')}
-                    className="absolute right-0 px-4 py-2 bg-sky-500 text-white rounded hover:bg-sky-600 flex items-center cursor-pointer"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20"
-                         fill="currentColor">
-                        <path
-                            d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
-                    </svg>
-                    Home
-                </button>
+                <h1 className="text-2xl font-bold text-gray-800">User Profile</h1>
+                <BackButton onClick={() => navigate('/home')}/>
             </div>
             <div className="flex flex-col md:flex-row items-center mb-8">
                 <div className="relative mb-4 md:mb-0 md:mr-8">
-                    <div
+                    <ProfilePicture
+                        imageUrl={profilePicUrl}
+                        uploading={uploading}
                         onClick={handleProfileClick}
-                        className="cursor-pointer relative"
-                    >
-                        {uploading && (
-                            <div
-                                className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
-                                <div
-                                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            </div>
-                        )}
-                        {profilePicUrl ? (
-                            <img
-                                src={profilePicUrl}
-                                alt="Profile"
-                                className="w-24 h-24 rounded-full object-cover border-2 border-sky-500"
-                                onError={() => setProfilePicUrl(null)}
-                            />
-                        ) : (
-                            <div
-                                className="w-24 h-24 rounded-full bg-sky-500 flex items-center justify-center text-white text-2xl font-bold">
-                                {userInfo.username.charAt(0).toUpperCase()}
-                            </div>
-                        )}
-                        <div className="absolute bottom-0 right-0 bg-sky-500 text-white rounded-full p-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                 stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
-                        </div>
-                    </div>
+                        showEditIcon={true}
+                    />
                     <input
                         type="file"
                         ref={fileInputRef}
@@ -164,84 +138,75 @@ function Profile() {
                 </div>
 
                 <div className="flex-1">
-                    <h2 className="text-xl font-bold text-sky-600">{userInfo.username}</h2>
+                    <h2 className="text-xl font-bold text-indigo-600">{userInfo.username}</h2>
                     <p className="text-gray-600">{userInfo.email}</p>
                     <p className="text-gray-600">Role: {userInfo.role}</p>
                 </div>
             </div>
 
-            <div className="bg-gray-100 p-4 rounded mb-6">
-                <h3 className="text-lg font-semibold mb-4">Game Statistics</h3>
+            <div className="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-100">
+                <h3 className="text-lg font-semibold mb-4 text-gray-800">Game Statistics</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-white p-3 rounded shadow">
-                        <p className="text-gray-500">Total Score</p>
-                        <p className="text-2xl font-bold">{userInfo.totalScore}</p>
-                    </div>
-                    <div className="bg-white p-3 rounded shadow">
-                        <p className="text-gray-500">Questions Answered</p>
-                        <p className="text-2xl font-bold">{userInfo.totalQuestionsAnswered}</p>
-                    </div>
-                    <div className="bg-white p-3 rounded shadow">
-                        <p className="text-gray-500">Average Score</p>
-                        <p className="text-2xl font-bold">{userInfo.averageScore}</p>
-                    </div>
+                    <StatCard title="Total Score" value={userInfo.totalScore}/>
+                    <StatCard title="Questions Answered" value={userInfo.totalQuestionsAnswered}/>
+                    <StatCard title="Average Score" value={userInfo.averageScore}/>
                 </div>
             </div>
 
             {isEditing ? (
-                <div className="bg-white border border-gray-200 rounded p-4">
-                    <h3 className="text-lg font-semibold mb-4">Edit Profile</h3>
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-800">Edit Profile</h3>
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
-                            <label htmlFor="username" className="block text-gray-700 mb-2">Username</label>
-                            <input
-                                type="text"
+                            <FormInput
                                 id="username"
-                                name="username"
+                                label="Username"
+                                type="text"
                                 value={formData.username}
                                 onChange={handleInputChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-sky-500"
                                 required
                             />
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="email" className="block text-gray-700 mb-2">Email</label>
-                            <input
-                                type="email"
+                            <FormInput
                                 id="email"
-                                name="email"
+                                label="Email"
+                                type="email"
                                 value={formData.email}
                                 onChange={handleInputChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-sky-500"
                                 required
                             />
                         </div>
-                        {updateError && <div className="text-red-500 mb-4">{updateError}</div>}
+                        <StatusMessage type="error" message={updateError} />
                         <div className="flex space-x-2">
-                            <button
+                            <Button
                                 type="submit"
+                                variant="primary"
+                                isLoading={updateLoading}
+                                loadingText="Saving..."
                                 disabled={updateLoading}
-                                className="px-4 py-2 bg-sky-500 text-white rounded hover:bg-sky-600 disabled:bg-gray-400"
                             >
-                                {updateLoading ? 'Saving...' : 'Save Changes'}
-                            </button>
-                            <button
+                                Save Changes
+                            </Button>
+                            <Button
                                 type="button"
+                                variant="secondary"
                                 onClick={() => setIsEditing(false)}
-                                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
                             >
                                 Cancel
-                            </button>
+                            </Button>
                         </div>
                     </form>
                 </div>
             ) : (
-                <button
-                    onClick={() => setIsEditing(true)}
-                    className="px-4 py-2 bg-sky-500 text-white rounded hover:bg-sky-600"
-                >
-                    Edit Profile
-                </button>
+                <div className="flex justify-center sm:justify-start">
+                    <Button
+                        variant="primary"
+                        onClick={() => setIsEditing(true)}
+                    >
+                        Edit Profile
+                    </Button>
+                </div>
             )}
         </div>
     );

@@ -1,17 +1,23 @@
-import { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import ProfileIcon from '../assets/profile.svg';
 import LogoutIcon from '../assets/logout.svg';
 import TrophyIcon from '../assets/trophy.svg';
-import { uploadProfilePicture, getProfilePictureUrl } from "../httpUtils/user.ts";
+import { getProfilePictureUrl } from "../httpUtils/user.ts";
 
 function Navbar() {
     const [username, setUsername] = useState<string | null>(null);
     const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
-    const [uploading, setUploading] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
-    const isLoggedIn = Boolean(localStorage.getItem('authToken'));
+    const location = useLocation();
+    const isLoginPage = location.pathname === '/' || location.pathname === '/login';
+    const isLoggedIn = Boolean(localStorage.getItem('authToken')) && !isLoginPage;
+
+    useEffect(() => {
+        if (isLoginPage) {
+            localStorage.clear();
+        }
+    }, [isLoginPage]);
 
     useEffect(() => {
         if (isLoggedIn) {
@@ -63,86 +69,55 @@ function Navbar() {
         navigate('/leaderboard');
     };
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            console.log("File selected:", file);
-            setUploading(true);
-
-            try {
-                const result = await uploadProfilePicture(file);
-                console.log("Upload result:", result);
-                setProfilePicUrl(result.imageUrl);
-                await fetchProfilePicture();
-            } catch (error) {
-                console.error('Failed to upload profile picture:', error);
-            } finally {
-                setUploading(false);
-            }
-        }
-    };
-
     return (
-        <div className="sticky top-0 z-10 flex items-center h-16 px-6 py-4 bg-sky-500 text-white shadow-md">
+        <div className="sticky top-0 z-10 flex items-center h-16 px-6 py-4 bg-indigo-600 text-white shadow-md">
             {isLoggedIn && username && (
-                <div className="flex items-center space-x-2 ml-4">
+                <div className="flex items-center">
                     <div
                         onClick={handleProfileClick}
-                        className="cursor-pointer relative"
+                        className="flex items-center cursor-pointer hover:bg-indigo-700 transition-colors rounded p-1"
                     >
-                        {uploading && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
-                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            </div>
-                        )}
-                        {profilePicUrl ? (
-                            <img
-                                src={profilePicUrl}
-                                alt="Profile"
-                                className="w-8 h-8 rounded-full object-cover"
-                                onError={() => setProfilePicUrl(null)}
-                            />
-                        ) : (
-                            <img
-                                src={ProfileIcon}
-                                alt="Profile Icon"
-                                className="w-8 h-8"
-                            />
-                        )}
+                        <div className="relative">
+                            {profilePicUrl ? (
+                                <img
+                                    src={profilePicUrl}
+                                    alt="Profile"
+                                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-white"
+                                    onError={() => setProfilePicUrl(null)}
+                                />
+                            ) : (
+                                <img
+                                    src={ProfileIcon}
+                                    alt="Profile Icon"
+                                    className="w-9 h-9 sm:w-9 sm:h-9"
+                                />
+                            )}
+                        </div>
+                        <h2 className="text-lg font-medium hidden md:block ml-2">
+                            {username}
+                        </h2>
                     </div>
-                    <h2 className="text-2xl font-bold ml-2 hidden md:block">
-                        {username}
-                    </h2>
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        className="hidden"
-                        accept="image/*"
-                    />
+                    <button
+                        onClick={handleLeaderboardClick}
+                        className="ml-3 p-1 rounded hover:bg-indigo-700 transition-colors flex items-center justify-center cursor-pointer"
+                        aria-label="Leaderboard"
+                    >
+                        <img src={TrophyIcon} alt="Leaderboard" className="w-5 h-5 sm:w-6 sm:h-6"/>
+                        <span className="ml-2 hidden md:inline">Leaderboard</span>
+                    </button>
                 </div>
             )}
-            <div className="absolute left-1/2 transform -translate-x-1/2 text-lg font-bold">
+            <div className="absolute left-1/2 transform -translate-x-1/2 text-sm sm:text-xl font-bold">
                 Max's Music Quiz
             </div>
             {isLoggedIn && (
-                <div className="ml-auto flex items-center space-x-2">
-                    {/* Leaderboard button */}
-                    <button
-                        onClick={handleLeaderboardClick}
-                        className="px-2 py-2 rounded cursor-pointer flex items-center justify-center"
-                        aria-label="Leaderboard"
-                    >
-                        <img src={TrophyIcon} alt="Leaderboard" className="w-8 h-8" />
-                        <span className="ml-1 hidden md:inline">Leaderboard</span>
-                    </button>
-
-                    {/* Logout button */}
+                <div className="ml-auto">
                     <button
                         onClick={handleLogout}
-                        className="px-2 py-2 rounded cursor-pointer flex items-center justify-center"
+                        className="p-1 rounded hover:bg-indigo-700 transition-colors flex items-center justify-center cursor-pointer"
                     >
-                        <img src={LogoutIcon} alt="Logout Icon" className="w-8 h-8" />
+                        <img src={LogoutIcon} alt="Logout Icon" className="w-6 h-6"/>
+                        <span className="ml-2 hidden md:inline">Logout</span>
                     </button>
                 </div>
             )}

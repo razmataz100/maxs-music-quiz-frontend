@@ -8,6 +8,7 @@ import Quiz from "./pages/Quiz.tsx";
 import CreateQuiz from './pages/CreateQuiz.tsx';
 import Profile from "./pages/Profile.tsx";
 import Leaderboard from "./pages/Leaderboard.tsx";
+import HowToPlay from "./pages/HowToPlay.tsx";
 
 function DebugRoutes() {
     return (
@@ -23,6 +24,7 @@ function DebugRoutes() {
             <Route path="/create-quiz" element={<CreateQuiz />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/how-to-play" element={<HowToPlay />} />
         </Routes>
     );
 }

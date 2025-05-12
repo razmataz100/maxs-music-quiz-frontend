@@ -1,18 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { endGame, startGame } from "../httpUtils/game.ts";
-import { API_BASE_URL } from "../config/apiConfig.ts";
-
-interface QuizQuestion {
-    id: number;
-    questionText: string;
-    songName: string;
-    artistName: string;
-    spotifyTrackId: string;
-    answerChoices: string[];
-    correctAnswer: string;
-    quizGameId: number;
-}
+import ConfirmationPopup from "../components/ConfirmationPopup.tsx";
+import {QuizQuestion} from "../types/game.ts";
+import {Button} from "../components/Button.tsx";
+import CloseIcon from "../assets/close.svg";
 
 function Quiz() {
     const { gameId } = useParams();
@@ -26,38 +18,26 @@ function Quiz() {
     const [correctAnswers, setCorrectAnswers] = useState(0);
     const [gameOver, setGameOver] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [playerKey, setPlayerKey] = useState(0);
+    const [showConfirmLeave, setShowConfirmLeave] = useState(false);
+    const [timerStarted, setTimerStarted] = useState(false);
 
     useEffect(() => {
-        const initializeGame = async () => {
+        const loadGame = async () => {
             try {
                 const authToken = localStorage.getItem("authToken");
                 if (!authToken || !gameId) return;
 
-                await startGame(Number(gameId), authToken);
-
-                const response = await fetch(`${API_BASE_URL}/game/${gameId}/start-game`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${authToken}`,
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error("Failed to fetch questions");
-                }
-
-                const data: QuizQuestion[] = await response.json();
-                setQuestions(data);
+                setLoading(true);
+                const questions = await startGame(Number(gameId), authToken);
+                setQuestions(questions);
                 setLoading(false);
             } catch (error) {
-                console.error("Error initializing the game:", error);
+                console.error("Error loading the game:", error);
                 setLoading(false);
             }
         };
 
-        initializeGame();
+        loadGame();
     }, [gameId]);
 
     useEffect(() => {
@@ -79,7 +59,7 @@ function Quiz() {
     }, [gameOver, gameId, correctAnswers]);
 
     useEffect(() => {
-        if (gameOver || showResult || !questions.length || loading) return;
+        if (gameOver || showResult || !questions.length || loading || !timerStarted) return;
 
         const timer = setInterval(() => {
             setTimeRemaining((prev) => {
@@ -93,14 +73,19 @@ function Quiz() {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [currentQuestionIndex, showResult, gameOver, questions.length, loading]);
+    }, [currentQuestionIndex, showResult, gameOver, questions.length, loading, timerStarted]);
 
     useEffect(() => {
-        setPlayerKey((prevKey) => prevKey + 1);
+        setTimerStarted(false);
+        setTimeRemaining(30);
     }, [currentQuestionIndex]);
 
+    const handleStartTimer = () => {
+        setTimerStarted(true);
+    };
+
     const handleAnswerSelect = (answer: string) => {
-        if (showResult) return;
+        if (showResult || !timerStarted) return;
 
         setSelectedAnswer(answer);
 
@@ -117,7 +102,6 @@ function Quiz() {
     const handleNextQuestion = () => {
         if (currentQuestionIndex < questions.length - 1) {
             setCurrentQuestionIndex((prev) => prev + 1);
-            setTimeRemaining(30);
             setSelectedAnswer(null);
             setShowResult(false);
         } else {
@@ -125,40 +109,60 @@ function Quiz() {
         }
     };
 
+    const handleLeaveClick = () => {
+        setShowConfirmLeave(true);
+    };
+
+    const handleConfirmLeave = () => {
+        navigate("/home");
+    };
+
+    const handleCancelLeave = () => {
+        setShowConfirmLeave(false);
+    };
+
     if (loading) {
         return (
-            <div className="p-8 bg-white border border-gray-300 shadow-md w-full max-w-4xl mx-auto text-center">
-                <h2 className="text-xl mb-6">Loading Quiz Questions...</h2>
-                <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <div className="p-8 bg-white border border-gray-200 shadow-md w-full max-w-4xl mx-auto text-center rounded-lg">
+                <h2 className="text-xl mb-6 text-gray-800">Loading Quiz Questions...</h2>
+                <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
             </div>
         );
     }
 
     if (gameOver) {
         return (
-            <div className="p-8 bg-white border border-gray-300 shadow-md w-full max-w-4xl mx-auto text-center">
-                <h2 className="text-2xl font-bold mb-4">Game Over!</h2>
-                <p className="text-xl mb-4">Your final score: {correctAnswers}/{questions.length}</p>
-                <button
-                    onClick={() => navigate("/profile")}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer"
+            <div className="p-8 bg-white border border-gray-200 shadow-md w-full max-w-4xl mx-auto text-center rounded-lg">
+                <h2 className="text-2xl font-bold mb-4 text-gray-800">Game Over!</h2>
+                <p className="text-xl mb-4 text-gray-700">Your final score: {correctAnswers}/{questions.length}</p>
+                <Button
+                    variant="secondary"
+                    onClick={() => navigate("/home")}
+                    className="mr-3"
                 >
-                    Back to Profile
-                </button>
+                    Back to Home
+                </Button>
+                <Button
+                    variant="primary"
+                    onClick={() => navigate("/profile")}
+                >
+                    View Profile
+                </Button>
             </div>
         );
     }
 
     if (!questions.length) {
         return (
-            <div className="p-8 bg-white border border-gray-300 shadow-md w-full max-w-4xl mx-auto text-center">
-                <h2 className="text-xl mb-6">No questions found for this game</h2>
-                <button
-                    onClick={() => navigate("/profile")}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            <div className="p-8 bg-white border border-gray-200 shadow-md w-full max-w-4xl mx-auto text-center rounded-lg">
+                <h2 className="text-xl mb-6 text-gray-800">No questions found for this game</h2>
+                <Button
+                    variant="secondary"
+                    onClick={() => navigate("/home")}
+                    className="mr-3"
                 >
-                    Back to Profile
-                </button>
+                    Back to Home
+                </Button>
             </div>
         );
     }
@@ -166,45 +170,74 @@ function Quiz() {
     const currentQuestion = questions[currentQuestionIndex];
 
     return (
-        <div className="p-8 bg-white border border-gray-300 shadow-md w-full max-w-4xl mx-auto">
-            <div className="flex justify-between items-center mb-6">
-                <div className="text-xl font-bold">Score: {correctAnswers}</div>
-                <div className="text-xl font-bold text-blue-600">
-                    Time: {timeRemaining}s
+        <div className="p-5 sm:p-10 bg-white border border-gray-200 shadow-md w-full max-w-4xl mx-auto rounded-lg flex flex-col h-full max-h-screen overflow-hidden">
+            <div className="relative flex justify-center items-center mb-4">
+                <Button
+                    variant="secondary"
+                    onClick={handleLeaveClick}
+                    className="absolute right-0 bg-gray-500 hover:bg-gray-600 flex items-center text-white"
+                >
+                    <div className="flex items-center">
+                        <img src={CloseIcon} alt="Close" className="h-5 w-5" />
+                        <span className="ml-1 hidden sm:inline">Leave</span>
+                    </div>
+                </Button>
+            </div>
+
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-3 mt-8">
+                <div className="text-base sm:text-lg font-bold text-gray-800 mb-1 sm:mb-0">Score: {correctAnswers}</div>
+                <div className="text-base sm:text-lg font-bold text-indigo-600 mb-1 sm:mb-0">
+                    Time: {timerStarted ? `${timeRemaining}s` : '--'}
                 </div>
-                <div className="text-xl font-bold">
+                <div className="text-base sm:text-lg font-bold text-gray-800">
                     Question {currentQuestionIndex + 1}/{questions.length}
                 </div>
             </div>
 
-            <h2 className="text-2xl font-bold mb-4 flex justify-center">{currentQuestion.questionText}</h2>
+            <h2 className="text-lg sm:text-xl font-bold mb-3 text-center text-gray-800">
+                {currentQuestion.questionText}
+            </h2>
 
-            <div className="flex justify-center">
-                <div className="relative w-3/4 mb-6">
+            <div className="flex justify-center mb-4">
+                <div className="relative w-full sm:w-3/4">
                     <iframe
-                        key={playerKey}
-                        src={`https://open.spotify.com/embed/track/${currentQuestion.spotifyTrackId}?utm_source=generator&theme=0&autoplay=1`}
+                        src={`https://open.spotify.com/embed/track/${currentQuestion.spotifyTrackId}?utm_source=generator&theme=0`}
                         loading="lazy"
-                        className="w-full h-20"
+                        className="w-full h-20 rounded-lg"
                     />
+                    {!timerStarted && (
+                        <div className="mt-2 text-center">
+                            <Button
+                                variant="primary"
+                                onClick={handleStartTimer}
+                                className="bg-green-500 hover:bg-green-600"
+                            >
+                                Start Timer (After Playing Song)
+                            </Button>
+                            <p className="text-sm text-gray-600 mt-1">Click play above, then start the timer</p>
+                        </div>
+                    )}
                 </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 mb-6">
+
+            <div className="grid grid-cols-2 gap-3 mb-4 overflow-auto max-h-48 sm:max-h-64">
                 {currentQuestion.answerChoices.map((answer, index) => (
                     <button
                         key={index}
                         onClick={() => handleAnswerSelect(answer)}
-                        disabled={showResult}
-                        className={`p-4 rounded-lg text-lg font-medium transition-colors ${
+                        disabled={showResult || !timerStarted}
+                        className={`p-3 rounded-lg text-base sm:text-lg font-medium transition-colors h-auto cursor-pointer ${
                             showResult
                                 ? answer === currentQuestion.correctAnswer
                                     ? "bg-green-500 text-white"
                                     : selectedAnswer === answer
                                         ? "bg-red-500 text-white"
-                                        : "bg-gray-200"
+                                        : "bg-gray-100 text-gray-700"
                                 : selectedAnswer === answer
-                                    ? "bg-blue-500 text-white"
-                                    : "bg-gray-200 hover:bg-gray-300"
+                                    ? "bg-indigo-600 text-white"
+                                    : timerStarted
+                                        ? "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
                         }`}
                     >
                         {answer}
@@ -213,39 +246,34 @@ function Quiz() {
             </div>
 
             {showResult && (
-                <div className="mb-6 p-4 rounded-lg bg-gray-100">
-                    <h3 className="text-xl font-bold mb-2">
-                        {selectedAnswer === currentQuestion.correctAnswer
-                            ? "Correct! 🎉"
-                            : "Wrong! 😢"}
-                    </h3>
-                    <p className="mb-1">
-                        <span className="font-bold">Song:</span> {currentQuestion.songName}
-                    </p>
-                    <p>
-                        <span className="font-bold">Artist:</span> {currentQuestion.artistName}
-                    </p>
-                    <p className="mt-2">
-                        <span className="font-bold">Correct Answer:</span> {currentQuestion.correctAnswer}
-                    </p>
+                <div className="flex justify-center mb-4">
+                    <Button
+                        variant="primary"
+                        onClick={handleNextQuestion}
+                        className="bg-emerald-500 hover:bg-emerald-600"
+                    >
+                        {currentQuestionIndex < questions.length - 1 ? "Next Question" : "Finish Game"}
+                    </Button>
                 </div>
             )}
 
-            {showResult && (
-                <button
-                    onClick={handleNextQuestion}
-                    className="px-4 py-2 bg-emerald-500 text-white rounded hover:bg-emerald-600"
-                >
-                    {currentQuestionIndex < questions.length - 1 ? "Next Question" : "Finish Game"}
-                </button>
-            )}
-
-            <div className="mt-4 w-full bg-gray-200 rounded-full h-2.5">
+            <div className="mt-auto w-full bg-gray-200 rounded-full h-2.5">
                 <div
-                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-1000"
+                    className="bg-indigo-600 h-2.5 rounded-full transition-all duration-1000"
                     style={{width: `${(timeRemaining / 30) * 100}%`}}
                 ></div>
             </div>
+
+            <ConfirmationPopup
+                isOpen={showConfirmLeave}
+                title="Leave Quiz?"
+                message="If you leave now, you'll lose your progress and any remaining questions will be marked incorrect. Are you sure?"
+                confirmText="Leave Quiz"
+                cancelText="Cancel"
+                onConfirm={handleConfirmLeave}
+                onCancel={handleCancelLeave}
+                confirmButtonColor="bg-red-500 hover:bg-red-600"
+            />
         </div>
     );
 }
