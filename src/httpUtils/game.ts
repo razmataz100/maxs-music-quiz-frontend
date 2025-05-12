@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "../config/apiConfig";
-import {CreateGameRequest, GameWithHighScore} from "../types/game.ts";
+import {CreateGameRequest, GameWithHighScore, QuizQuestion} from "../types/game.ts";
 
 
 async function handleApiResponse<T>(response: Response): Promise<T> {
@@ -25,7 +25,11 @@ async function handleApiResponse<T>(response: Response): Promise<T> {
     return await response.json();
 }
 
-export async function startGame(gameId: number, authToken: string): Promise<void> {
+export async function startGame(gameId: number, authToken: string): Promise<QuizQuestion[]> {
+    if (!authToken || !gameId) {
+        throw new Error("Authentication token or Game ID is missing");
+    }
+
     const response = await fetch(`${API_BASE_URL}/game/${gameId}/start-game`, {
         method: 'POST',
         headers: {
@@ -34,8 +38,9 @@ export async function startGame(gameId: number, authToken: string): Promise<void
         },
     });
 
-    return handleApiResponse(response);
+    return handleApiResponse<QuizQuestion[]>(response);
 }
+
 
 export async function getAllGames(userId: number, authToken: string): Promise<GameWithHighScore[]> {
     const response = await fetch(`${API_BASE_URL}/game/all/${userId}`, {
@@ -90,5 +95,6 @@ export async function deleteGame(gameId: number, authToken: string): Promise<voi
 
     return handleApiResponse(response);
 }
+
 
 

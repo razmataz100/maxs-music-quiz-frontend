@@ -3,6 +3,7 @@ export interface GameWithHighScore {
     theme: string;
     highScore?: number;
     highScoreUsername?: string;
+    highScoreProfilePictureUrl?: string;
     userHighScore?: number;
     questionsAnswered?: number;
     correctAnswers?: number;
@@ -11,4 +12,15 @@ export interface GameWithHighScore {
 export interface CreateGameRequest {
     theme: string;
     playlistUrl: string;
+}
+
+export interface QuizQuestion {
+    id: number;
+    questionText: string;
+    songName: string;
+    artistName: string;
+    spotifyTrackId: string;
+    answerChoices: string[];
+    correctAnswer: string;
+    quizGameId: number;
 }

@@ -1,19 +1,33 @@
-function Footer() {
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+
+const Footer = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        const authToken = localStorage.getItem('authToken');
+        setIsLoggedIn(Boolean(authToken));
+    }, [location.pathname]);
+
     return (
-        <div className="sticky bottom-0 z-10 flex items-center justify-between h-16 px-6 py-4 bg-gray-800 text-white">
-            <div className="text-sm">
-                &copy; {new Date().getFullYear()} Max's Music Quiz. All rights reserved.
+        <div className="sticky bottom-0 z-10 flex items-center justify-between h-16 px-6 py-4 bg-gray-100 text-gray-800 border-t border-gray-200">
+            <div className="text-sm text-gray-500">
+                &copy; {new Date().getFullYear()} Max's Music Quiz.
             </div>
             <div className="flex space-x-4">
-                <a href="/terms" className="hover:underline">
-                    Terms of Service
-                </a>
-                <a href="/privacy" className="hover:underline">
-                    Privacy Policy
-                </a>
+                {isLoggedIn && (
+                    <button
+                        onClick={() => navigate('/how-to-play')}
+                        className="text-sm text-gray-500 cursor-pointer hover:text-gray-700"
+                    >
+                        How to Play
+                    </button>
+                )}
             </div>
         </div>
     );
-}
+};
 
 export default Footer;

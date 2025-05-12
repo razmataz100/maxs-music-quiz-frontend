@@ -7,8 +7,12 @@ import {
     getMonthlyLeaderboard
 } from '../httpUtils/leaderboard';
 import { LeaderboardEntry } from "../types/leaderboard.ts";
-import ProfileIcon from '../assets/profile.svg';
 import { useNavigate } from 'react-router-dom';
+import BackButton from "../components/BackButton.tsx";
+import {LoadingSpinner} from "../components/LoadingSpinner.tsx";
+import {StatusMessage} from "../components/StatusMessage.tsx";
+import {ProfilePicture} from "../components/ProfilePicture.tsx";
+import {Button} from "../components/Button.tsx";
 
 function Leaderboard() {
     const [leaderboardType, setLeaderboardType] = useState<string>('total');
@@ -72,135 +76,120 @@ function Leaderboard() {
         }
     };
 
-    if (loading) return (
-        <div className="flex justify-center items-center p-8 h-64">
-            <div className="w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
-    );
-
-    if (error) return (
-        <div className="p-8 bg-red-100 border border-red-400 text-red-700 rounded">
-            <p>Error: {error}</p>
-        </div>
-    );
+    if (loading) return <LoadingSpinner fullPage size="large" />;
+    if (error) return <StatusMessage type="error" message={error} />;
 
     return (
-        <div className="relative p-8 bg-white border border-gray-300 shadow-md w-full max-w-4xl mx-auto mt-8 rounded-lg">
-            <div className="relative flex justify-center items-center mb-6">
-                <h2 className="text-2xl font-bold">{getLeaderboardTitle()}</h2>
-                <button
-                    onClick={() => navigate('/home')}
-                    className="absolute right-0 px-4 py-2 bg-sky-500 text-white rounded hover:bg-sky-600 flex items-center cursor-pointer"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20"
-                         fill="currentColor">
-                        <path
-                            d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
-                    </svg>
-                    Home
-                </button>
+        <div className="flex flex-col bg-white border border-gray-200 shadow-md w-full max-w-4xl rounded-lg h-[calc(100vh-14rem)] sm:h-auto sm:max-h-[70vh]">
+            {/* Sticky header */}
+            <div className="sticky top-0 z-10 bg-white rounded-t-lg border-b border-gray-200">
+                <div className="p-6">
+                    <div className="relative flex justify-start sm:justify-center items-center">
+                        <h2 className="text-base xs:text-lg sm:text-2xl font-bold text-gray-800 text-left sm:text-center w-full sm:w-auto pr-14 sm:pr-0">
+                            {getLeaderboardTitle()}
+                        </h2>
+                        <BackButton onClick={() => navigate('/home')}/>
+                    </div>
+
+                    <div className="mt-4 flex flex-wrap justify-center gap-2">
+                        <Button
+                            variant={leaderboardType === 'total' ? 'primary' : 'secondary'}
+                            onClick={() => setLeaderboardType('total')}
+                            className={leaderboardType !== 'total' ? 'bg-gray-100 hover:bg-gray-200 text-gray-800' : ''}
+                        >
+                            Total Score
+                        </Button>
+                        <Button
+                            variant={leaderboardType === 'average' ? 'primary' : 'secondary'}
+                            onClick={() => setLeaderboardType('average')}
+                            className={leaderboardType !== 'average' ? 'bg-gray-100 hover:bg-gray-200 text-gray-800' : ''}
+                        >
+                            Average Score
+                        </Button>
+                        <Button
+                            variant={leaderboardType === 'games' ? 'primary' : 'secondary'}
+                            onClick={() => setLeaderboardType('games')}
+                            className={leaderboardType !== 'games' ? 'bg-gray-100 hover:bg-gray-200 text-gray-800' : ''}
+                        >
+                            Games Completed
+                        </Button>
+                        <Button
+                            variant={leaderboardType === 'weekly' ? 'primary' : 'secondary'}
+                            onClick={() => setLeaderboardType('weekly')}
+                            className={leaderboardType !== 'weekly' ? 'bg-gray-100 hover:bg-gray-200 text-gray-800' : ''}
+                        >
+                            Weekly
+                        </Button>
+                        <Button
+                            variant={leaderboardType === 'monthly' ? 'primary' : 'secondary'}
+                            onClick={() => setLeaderboardType('monthly')}
+                            className={leaderboardType !== 'monthly' ? 'bg-gray-100 hover:bg-gray-200 text-gray-800' : ''}
+                        >
+                            Monthly
+                        </Button>
+                    </div>
+                </div>
             </div>
 
-            <div className="mb-6 flex flex-wrap justify-center gap-2">
-                <button
-                    onClick={() => setLeaderboardType('total')}
-                    className={`px-4 py-2 cursor-pointer rounded ${leaderboardType === 'total' ? 'bg-sky-500 text-white' : 'bg-gray-200'}`}
-                >
-                    Total Score
-                </button>
-                <button
-                    onClick={() => setLeaderboardType('average')}
-                    className={`px-4 py-2 cursor-pointer rounded ${leaderboardType === 'average' ? 'bg-sky-500 text-white' : 'bg-gray-200'}`}
-                >
-                    Average Score
-                </button>
-                <button
-                    onClick={() => setLeaderboardType('games')}
-                    className={`px-4 py-2 cursor-pointer rounded ${leaderboardType === 'games' ? 'bg-sky-500 text-white' : 'bg-gray-200'}`}
-                >
-                    Games Completed
-                </button>
-                <button
-                    onClick={() => setLeaderboardType('weekly')}
-                    className={`px-4 py-2 cursor-pointer rounded ${leaderboardType === 'weekly' ? 'bg-sky-500 text-white' : 'bg-gray-200'}`}
-                >
-                    Weekly
-                </button>
-                <button
-                    onClick={() => setLeaderboardType('monthly')}
-                    className={`px-4 py-2 cursor-pointer rounded ${leaderboardType === 'monthly' ? 'bg-sky-500 text-white' : 'bg-gray-200'}`}
-                >
-                    Monthly
-                </button>
-            </div>
-
-            {leaderboard.length > 0 ? (
-                <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white">
-                        <thead>
-                        <tr className="bg-gray-100 border-b">
-                            <th className="py-3 px-4 text-left w-16">Rank</th>
-                            <th className="py-3 px-4 text-left">Player</th>
-                            <th className="py-3 px-4 text-right">{getScoreLabel()}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {leaderboard.map((entry, index) => {
-                            return (
-                                <tr key={`${entry.userId}-${index}`} className="border-b hover:bg-gray-50">
-                                    <td className="py-3 px-4">
-                                        <div className="flex items-center">
-                                            {entry.rank <= 3 ? (
-                                                <span
-                                                    className={`flex items-center justify-center w-8 h-8 rounded-full mr-2 ${
-                                                        entry.rank === 1 ? 'bg-yellow-400' :
-                                                            entry.rank === 2 ? 'bg-gray-300' : 'bg-amber-600'
-                                                    } text-white font-bold`}>
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto rounded-b-lg">
+                <div className="p-6">
+                    {leaderboard.length > 0 ? (
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead>
+                                <tr className="bg-gray-100 border-b border-gray-300">
+                                    <th className="py-3 px-4 text-left w-16 text-gray-700">Rank</th>
+                                    <th className="py-3 px-4 text-left text-gray-700">Player</th>
+                                    <th className="py-3 px-4 text-right text-gray-700">{getScoreLabel()}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {leaderboard.map((entry, index) => {
+                                    return (
+                                        <tr key={`${entry.userId}-${index}`}
+                                            className="border-b border-gray-200 hover:bg-gray-100 transition-colors bg-gray-50">
+                                            <td className="py-3 px-4">
+                                                <div className="flex items-center">
+                                                    {entry.rank <= 3 ? (
+                                                        <span
+                                                            className={`flex items-center justify-center w-8 h-8 rounded-full mr-2 text-white font-bold ${
+                                                                entry.rank === 1 ? 'bg-amber-400' :
+                                                                    entry.rank === 2 ? 'bg-gray-400' : 'bg-amber-600'
+                                                            }`}>
                                                         {entry.rank}
                                                     </span>
-                                            ) : (
-                                                <span className="ml-3 text-gray-600">{entry.rank}</span>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td className="py-3 px-4">
-                                        <div className="flex items-center">
-                                            {entry.profilePictureUrl ? (
-                                                <img
-                                                    src={`http://localhost:5284${entry.profilePictureUrl}`}
-                                                    alt={entry.username}
-                                                    className="w-8 h-8 rounded-full mr-3 object-cover"
-                                                    onError={(e) => {
-                                                        const target = e.target as HTMLImageElement;
-                                                        target.onerror = null;
-                                                        target.src = ProfileIcon;
-                                                        target.className = "w-8 h-8 mr-3";
-                                                    }}
-                                                />
-                                            ) : (
-                                                <img
-                                                    src={ProfileIcon}
-                                                    alt="Profile Icon"
-                                                    className="w-8 h-8 mr-3"
-                                                />
-                                            )}
-                                            <span className="font-medium">{entry.username}</span>
-                                        </div>
-                                    </td>
-                                    <td className="py-3 px-4 text-right font-semibold">
-                                        {entry.score}{leaderboardType === 'average' ? ' %' : ''}
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                        </tbody>
-                    </table>
+                                                    ) : (
+                                                        <span className="ml-3 text-gray-600">{entry.rank}</span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="py-3 px-4">
+                                                <div className="flex items-center">
+                                                    <ProfilePicture
+                                                        imageUrl={entry.profilePictureUrl}
+                                                        className="w-9 h-9 mr-3"
+                                                        baseUrl="http://localhost:5284"
+                                                    />
+                                                    <span className="font-medium text-gray-800">{entry.username}</span>
+                                                </div>
+                                            </td>
+                                            <td className="py-3 px-4 text-right font-semibold text-gray-800">
+                                                {entry.score}{leaderboardType === 'average' ? ' %' : ''}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="text-center py-8 text-gray-500">
+                            No data available for this leaderboard.
+                        </div>
+                    )}
                 </div>
-            ) : (
-                <div className="text-center py-8 text-gray-500">
-                    No data available for this leaderboard.
-                </div>
-            )}
+            </div>
         </div>
     );
 }

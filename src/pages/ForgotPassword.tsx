@@ -55,11 +55,11 @@ function ForgotPassword() {
     };
 
     return (
-        <div className="flex items-center justify-center bg-gray-100">
-            <div className="relative w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+        <div className="flex items-center justify-center bg-gray-50">
+            <div className="relative w-full max-w-md p-8 bg-white rounded-lg shadow-md border border-gray-200">
                 <button
                     onClick={() => navigate('/')}
-                    className="absolute top-4 left-4 text-sm text-blue-500 hover:underline cursor-pointer"
+                    className="absolute top-4 right-4 text-indigo-600 hover:text-indigo-800 transition-colors cursor-pointer"
                 >
                     ← Back
                 </button>
@@ -68,13 +68,13 @@ function ForgotPassword() {
                 </h1>
 
                 {error && (
-                    <div className="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-md">
+                    <div className="p-3 mb-4 text-sm text-red-700 bg-red-50 rounded-md">
                         {error}
                     </div>
                 )}
 
                 {successMessage && (
-                    <div className="p-3 mb-4 text-sm text-green-700 bg-green-100 rounded-md">
+                    <div className="p-3 mb-4 text-sm text-green-700 bg-green-50 rounded-md">
                         {successMessage}
                     </div>
                 )}
@@ -92,13 +92,13 @@ function ForgotPassword() {
                                 placeholder="Enter your email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="flex-grow px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="flex-grow px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 disabled={isLoading}
                                 autoComplete="off"
                             />
                             <button
                                 onClick={handleSendEmail}
-                                className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="cursor-pointer px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                 disabled={isLoading}
                             >
                                 {isLoading ? 'Sending...' : 'Send Email'}
@@ -116,7 +116,7 @@ function ForgotPassword() {
                             placeholder="Enter the reset token"
                             value={token}
                             onChange={(e) => setToken(e.target.value)}
-                            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             disabled={isLoading}
                             autoComplete="off"
                         />
@@ -132,14 +132,14 @@ function ForgotPassword() {
                             placeholder="Enter your new password"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
-                            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             disabled={isLoading}
                             autoComplete="new-password"
                         />
                     </div>
                     <button
                         onClick={handleResetPassword}
-                        className="w-full px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="cursor-pointer w-full px-4 py-2 text-white bg-emerald-500 rounded-md hover:bg-emerald-600 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
                         disabled={isLoading}
                     >
                         {isLoading ? 'Resetting...' : 'Reset Password'}

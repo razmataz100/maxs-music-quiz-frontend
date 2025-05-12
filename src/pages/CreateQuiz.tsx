@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createGame } from '../httpUtils/game';
 import { CreateGameRequest } from '../types/game';
+import BackButton from "../components/BackButton.tsx";
+import {FormInput} from "../components/FormInput.tsx";
 
 function CreateQuiz() {
     const [theme, setTheme] = useState('');
@@ -44,50 +46,38 @@ function CreateQuiz() {
     };
 
     return (
-        <div className="p-8 bg-white border border-gray-300 shadow-md w-full max-w-4xl h-auto">
-            <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Create a New Quiz</h3>
-                <button
-                    onClick={handleBack}
-                    className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 cursor-pointer"
-                >
-                    Back
-                </button>
+        <div className="p-8 bg-white border border-gray-200 shadow-md w-full max-w-4xl h-auto rounded-lg">
+            <div className="relative flex justify-center items-center mb-6">
+                <h3 className="text-lg xs:text-xl sm:text-2xl font-semibold text-gray-800 pr-10">Create a New Quiz</h3>
+                <BackButton onClick={handleBack}/>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                {error && <p className="text-red-500">{error}</p>}
-                {successMessage && <p className="text-green-500">{successMessage}</p>}
-                <div>
-                    <label htmlFor="theme" className="block text-sm font-medium text-gray-700">
-                        Theme
-                    </label>
-                    <input
-                        id="theme"
-                        type="text"
-                        value={theme}
-                        onChange={(e) => setTheme(e.target.value)}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:bg-gray-100 focus:outline-none focus:ring-0"
-                        placeholder="Enter quiz theme"
-                    />
-                </div>
-                <div>
-                    <label htmlFor="playlistUrl" className="block text-sm font-medium text-gray-700">
-                        Playlist URL
-                    </label>
-                    <input
-                        id="playlistUrl"
-                        type="url"
-                        value={playlistUrl}
-                        onChange={(e) => setPlaylistUrl(e.target.value)}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:bg-gray-100 focus:outline-none focus:ring-0"
-                        placeholder="Enter playlist URL"
-                    />
-                </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+                {error && <p className="text-red-500 p-3 bg-red-50 rounded-md">{error}</p>}
+                {successMessage && <p className="text-green-600 p-3 bg-green-50 rounded-md">{successMessage}</p>}
+
+                <FormInput
+                    id="theme"
+                    label="Theme"
+                    type="text"
+                    value={theme}
+                    onChange={(e) => setTheme(e.target.value)}
+                    placeholder="Enter quiz theme"
+                />
+
+                <FormInput
+                    id="playlistUrl"
+                    label="Playlist URL"
+                    type="url"
+                    value={playlistUrl}
+                    onChange={(e) => setPlaylistUrl(e.target.value)}
+                    placeholder="Enter playlist URL"
+                />
+
                 <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`px-4 py-2 text-white rounded ${
-                        isSubmitting ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'
+                    className={`px-4 py-2 text-white rounded-md transition-colors ${
+                        isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-500 hover:bg-emerald-600'
                     }`}
                 >
                     {isSubmitting ? 'Creating...' : 'Create Quiz'}
