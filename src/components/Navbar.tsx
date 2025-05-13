@@ -82,7 +82,7 @@ function Navbar() {
                                 <img
                                     src={profilePicUrl}
                                     alt="Profile"
-                                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-white"
+                                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-transparent"
                                     onError={() => setProfilePicUrl(null)}
                                 />
                             ) : (

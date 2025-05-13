@@ -73,7 +73,6 @@ function Home() {
 
     return (
         <div className="flex flex-col bg-white border border-gray-200 shadow-md w-full max-w-4xl rounded-lg h-[calc(100vh-14rem)] sm:h-auto sm:max-h-[70vh]">
-            {/* Sticky header */}
             <div className="sticky top-0 z-10 bg-white rounded-t-lg border-b border-gray-200">
                 <div className="p-6">
                     <div className="relative flex justify-start sm:justify-center items-center">
@@ -82,9 +81,9 @@ function Home() {
                         </h3>
                         {userRole === UserRole.Admin && (
                             <Button
-                                variant="primary"
+                                variant="green"
                                 onClick={() => navigate('/create-quiz')}
-                                className="absolute right-0 bg-emerald-500 hover:bg-emerald-600"
+                                className="absolute right-0"
                             >
                                 <div className="flex items-center">
                                     <img src={PlusIcon} alt="Plus" className="h-5 w-5" />
@@ -96,7 +95,6 @@ function Home() {
                 </div>
             </div>
 
-            {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto rounded-b-lg">
                 <div className="p-6">
                     <ul className="list-none space-y-4">

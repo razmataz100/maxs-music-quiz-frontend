@@ -4,6 +4,7 @@ import { createGame } from '../httpUtils/game';
 import { CreateGameRequest } from '../types/game';
 import BackButton from "../components/BackButton.tsx";
 import {FormInput} from "../components/FormInput.tsx";
+import {Button} from "../components/Button.tsx";
 
 function CreateQuiz() {
     const [theme, setTheme] = useState('');
@@ -72,16 +73,14 @@ function CreateQuiz() {
                     onChange={(e) => setPlaylistUrl(e.target.value)}
                     placeholder="Enter playlist URL"
                 />
-
-                <button
+                <Button
                     type="submit"
-                    disabled={isSubmitting}
-                    className={`px-4 py-2 text-white rounded-md transition-colors ${
-                        isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-500 hover:bg-emerald-600'
-                    }`}
+                    variant="green"
+                    isLoading={isSubmitting}
+                    loadingText="Creating..."
                 >
-                    {isSubmitting ? 'Creating...' : 'Create Quiz'}
-                </button>
+                    Create Quiz
+                </Button>
             </form>
         </div>
     );
