@@ -157,7 +157,7 @@ function Home() {
                                         {game.highScore ? (
                                             <>
                                                 <p className="text-gray-700 mb-2">High
-                                                    Score: {game.highScore}/{game.questionsAnswered ?? "N/A"}</p>
+                                                    Score: {game.highScore}/{game.highScoreQuestions ?? "N/A"}</p>
                                                 <div className="flex items-center mt-1">
                                                     <ProfilePicture
                                                         imageUrl={game.highScoreProfilePictureUrl || null}
@@ -167,7 +167,8 @@ function Home() {
                                                     <div className="flex flex-col ml-2">
                                                         <span className="text-gray-500">{game.highScoreUsername}</span>
                                                         {game.highScoreDate && (
-                                                            <span className="text-xs text-gray-400">{formatDate(game.highScoreDate)}</span>
+                                                            <span
+                                                                className="text-xs text-gray-400">{formatDate(game.highScoreDate)}</span>
                                                         )}
                                                     </div>
                                                 </div>
