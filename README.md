@@ -1,54 +1,49 @@
-# React + TypeScript + Vite
+# Max's Music Quiz - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React frontend for the music quiz application.
 
-Currently, two official plugins are available:
+> This is the frontend. You'll also need the [backend API](https://github.com/razmataz100/maxs-music-quiz-backend) running for it to work.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Setup
 
-## Expanding the ESLint configuration
+1. **Install prerequisites**
+    - Node.js 18+
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+2. **Clone and install**
+   ```bash
+   git clone https://github.com/razmataz100/maxs-music-quiz-frontend
+   cd maxs-music-quiz-frontend
+   npm install
+   ```
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+3. **Configure API URL**
+    - Create `.env` file in the root directory
+    - Add: `VITE_API_BASE_URL=http://localhost:5000`
+    - Or set it when running: `VITE_API_BASE_URL=http://localhost:5000 npm run dev`
+
+4. **Run**
+   ```bash
+   npm run dev
+   ```
+
+   App will be at `http://localhost:5173`
+
+## Build for Production
+
+```bash
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Technologies
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- React 18
+- Vite
+- React Router
+- Axios
+- Tailwind CSS
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## Common Issues
+
+- **API connection failed**: Check backend is running
+- **CORS errors**: Backend should allow `http://localhost:5173`
+- **Port already in use**: Change port in `vite.config.js`
