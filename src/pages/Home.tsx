@@ -174,6 +174,7 @@ function Home() {
                                         <Button
                                             variant="secondary"
                                             onClick={(e) => handleDeleteClick(game.gameId, e)}
+                                            className="hover:bg-red-100 hover:text-red-600 transition-colors"
                                         >
                                             X
                                         </Button>

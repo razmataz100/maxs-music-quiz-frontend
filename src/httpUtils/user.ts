@@ -1,22 +1,20 @@
-import {RegisterRequest, RegisterResponse} from "../types/registerRequest.ts";
-import {API_BASE_URL} from "../config/apiConfig.ts";
-import {UpdateUserRequest, User} from "../types/user.ts";
+import axios, { AxiosError } from 'axios';
+import { RegisterRequest, RegisterResponse } from "../types/registerRequest.ts";
+import { API_BASE_URL } from "../config/apiConfig.ts";
+import { UpdateUserRequest, User } from "../types/user.ts";
 
 export async function register(request: RegisterRequest): Promise<RegisterResponse> {
-    const response = await fetch(`${API_BASE_URL}/user/register`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Registration failed. Please try again.');
+    try {
+        const { data } = await axios.post<RegisterResponse>(
+            `${API_BASE_URL}/user/register`,
+            request
+        );
+        return data;
+    } catch (error) {
+        const axiosError = error as AxiosError<{ error?: string }>;
+        const message = axiosError.response?.data?.error || 'Registration failed. Please try again.';
+        throw new Error(message);
     }
-
-    return await response.json();
 }
 
 export async function uploadProfilePicture(file: File): Promise<{imageUrl: string}> {
@@ -27,22 +25,25 @@ export async function uploadProfilePicture(file: File): Promise<{imageUrl: strin
     }
 
     const formData = new FormData();
-    formData.append('file', file); // Changed to 'file' to match the controller parameter
+    formData.append('file', file);
 
-    const response = await fetch(`${API_BASE_URL}/user/upload-profile-picture`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
-        body: formData
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to upload profile picture. Please try again.');
+    try {
+        const { data } = await axios.post<{imageUrl: string}>(
+            `${API_BASE_URL}/user/upload-profile-picture`,
+            formData,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
+        );
+        return data;
+    } catch (error) {
+        const axiosError = error as AxiosError<{ error?: string }>;
+        const message = axiosError.response?.data?.error || 'Failed to upload profile picture. Please try again.';
+        throw new Error(message);
     }
-
-    return await response.json();
 }
 
 export async function getProfilePictureUrl(): Promise<{ imageUrl: string } | null> {
@@ -53,24 +54,23 @@ export async function getProfilePictureUrl(): Promise<{ imageUrl: string } | nul
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/user/profile-picture`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
+        const response = await axios.get(
+            `${API_BASE_URL}/user/profile-picture`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                responseType: 'blob'
             }
-        });
+        );
 
-        if (!response.ok) {
-            if (response.status === 404) {
-                return null;
-            }
-            throw new Error(`Failed to fetch profile picture: ${response.statusText}`);
-        }
-
-        const blob = await response.blob();
-        const imageUrl = URL.createObjectURL(blob);
+        const imageUrl = URL.createObjectURL(response.data);
         return { imageUrl };
     } catch (error) {
+        const axiosError = error as AxiosError;
+        if (axiosError.response?.status === 404) {
+            return null;
+        }
         console.error('Error fetching profile picture:', error);
         return null;
     }
@@ -84,18 +84,15 @@ export async function getUserInfo(): Promise<User | null> {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/user/user-info`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
+        const { data } = await axios.get<User>(
+            `${API_BASE_URL}/user/user-info`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
             }
-        });
-
-        if (!response.ok) {
-            throw new Error(`Failed to fetch user info: ${response.statusText}`);
-        }
-
-        return await response.json();
+        );
+        return data;
     } catch (error) {
         console.error('Error fetching user info:', error);
         return null;
@@ -109,24 +106,20 @@ export async function updateUserInfo(request: UpdateUserRequest): Promise<User> 
         throw new Error('Authentication required to update user information');
     }
 
-    const response = await fetch(`${API_BASE_URL}/user/update`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(request)
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to update user information. Please try again.');
+    try {
+        const { data } = await axios.put<User>(
+            `${API_BASE_URL}/user/update`,
+            request,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        );
+        return data;
+    } catch (error) {
+        const axiosError = error as AxiosError<{ error?: string }>;
+        const message = axiosError.response?.data?.error || 'Failed to update user information. Please try again.';
+        throw new Error(message);
     }
-
-    return await response.json();
 }
-
-
-
-
-

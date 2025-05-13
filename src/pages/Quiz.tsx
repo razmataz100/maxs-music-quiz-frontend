@@ -18,8 +18,9 @@ function Quiz() {
     const [correctAnswers, setCorrectAnswers] = useState(0);
     const [gameOver, setGameOver] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [playerKey, setPlayerKey] = useState(0);
     const [showConfirmLeave, setShowConfirmLeave] = useState(false);
-    const [timerStarted, setTimerStarted] = useState(false);
+
 
     useEffect(() => {
         const loadGame = async () => {
@@ -59,7 +60,7 @@ function Quiz() {
     }, [gameOver, gameId, correctAnswers]);
 
     useEffect(() => {
-        if (gameOver || showResult || !questions.length || loading || !timerStarted) return;
+        if (gameOver || showResult || !questions.length || loading) return;
 
         const timer = setInterval(() => {
             setTimeRemaining((prev) => {
@@ -73,19 +74,14 @@ function Quiz() {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [currentQuestionIndex, showResult, gameOver, questions.length, loading, timerStarted]);
+    }, [currentQuestionIndex, showResult, gameOver, questions.length, loading]);
 
     useEffect(() => {
-        setTimerStarted(false);
-        setTimeRemaining(30);
+        setPlayerKey((prevKey) => prevKey + 1);
     }, [currentQuestionIndex]);
 
-    const handleStartTimer = () => {
-        setTimerStarted(true);
-    };
-
     const handleAnswerSelect = (answer: string) => {
-        if (showResult || !timerStarted) return;
+        if (showResult) return;
 
         setSelectedAnswer(answer);
 
@@ -102,6 +98,7 @@ function Quiz() {
     const handleNextQuestion = () => {
         if (currentQuestionIndex < questions.length - 1) {
             setCurrentQuestionIndex((prev) => prev + 1);
+            setTimeRemaining(30);
             setSelectedAnswer(null);
             setShowResult(false);
         } else {
@@ -170,7 +167,8 @@ function Quiz() {
     const currentQuestion = questions[currentQuestionIndex];
 
     return (
-        <div className="p-5 sm:p-10 bg-white border border-gray-200 shadow-md w-full max-w-4xl mx-auto rounded-lg flex flex-col h-full max-h-screen overflow-hidden">
+        <div
+            className="p-5 sm:p-10 bg-white border border-gray-200 shadow-md w-full max-w-4xl mx-auto rounded-lg flex flex-col h-full max-h-screen overflow-hidden">
             <div className="relative flex justify-center items-center mb-4">
                 <Button
                     variant="secondary"
@@ -187,7 +185,7 @@ function Quiz() {
             <div className="flex flex-col sm:flex-row justify-between items-center mb-3 mt-8">
                 <div className="text-base sm:text-lg font-bold text-gray-800 mb-1 sm:mb-0">Score: {correctAnswers}</div>
                 <div className="text-base sm:text-lg font-bold text-indigo-600 mb-1 sm:mb-0">
-                    Time: {timerStarted ? `${timeRemaining}s` : '--'}
+                    Time: {timeRemaining}s
                 </div>
                 <div className="text-base sm:text-lg font-bold text-gray-800">
                     Question {currentQuestionIndex + 1}/{questions.length}
@@ -201,22 +199,11 @@ function Quiz() {
             <div className="flex justify-center mb-4">
                 <div className="relative w-full sm:w-3/4">
                     <iframe
-                        src={`https://open.spotify.com/embed/track/${currentQuestion.spotifyTrackId}?utm_source=generator&theme=0`}
+                        key={playerKey}
+                        src={`https://open.spotify.com/embed/track/${currentQuestion.spotifyTrackId}?utm_source=generator&theme=0&autoplay=1`}
                         loading="lazy"
-                        className="w-full h-20 rounded-lg"
+                        className="w-full h-20"
                     />
-                    {!timerStarted && (
-                        <div className="mt-2 text-center">
-                            <Button
-                                variant="primary"
-                                onClick={handleStartTimer}
-                                className="bg-green-500 hover:bg-green-600"
-                            >
-                                Start Timer (After Playing Song)
-                            </Button>
-                            <p className="text-sm text-gray-600 mt-1">Click play above, then start the timer</p>
-                        </div>
-                    )}
                 </div>
             </div>
 
@@ -225,7 +212,7 @@ function Quiz() {
                     <button
                         key={index}
                         onClick={() => handleAnswerSelect(answer)}
-                        disabled={showResult || !timerStarted}
+                        disabled={showResult}
                         className={`p-3 rounded-lg text-base sm:text-lg font-medium transition-colors h-auto cursor-pointer ${
                             showResult
                                 ? answer === currentQuestion.correctAnswer
@@ -235,9 +222,7 @@ function Quiz() {
                                         : "bg-gray-100 text-gray-700"
                                 : selectedAnswer === answer
                                     ? "bg-indigo-600 text-white"
-                                    : timerStarted
-                                        ? "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                    : "bg-gray-100 hover:bg-gray-200 text-gray-700"
                         }`}
                     >
                         {answer}

@@ -1,58 +1,46 @@
+import axios, { AxiosError } from 'axios';
 import { LoginRequest, LoginResponse } from "../types/auth";
-import {API_BASE_URL} from "../config/apiConfig.ts";
-import {PasswordResetConfirmationRequest, PasswordResetRequest} from "../types/resetPassword.ts";
-
+import { API_BASE_URL } from "../config/apiConfig.ts";
+import { PasswordResetConfirmationRequest, PasswordResetRequest } from "../types/resetPassword.ts";
 
 export async function login(request: LoginRequest): Promise<LoginResponse> {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Login failed. Please check your credentials.');
+    try {
+        const { data } = await axios.post<LoginResponse>(
+            `${API_BASE_URL}/auth/login`,
+            request
+        );
+        return data;
+    } catch (error) {
+        const axiosError = error as AxiosError<{ message?: string }>;
+        const message = axiosError.response?.data?.message || 'Login failed. Please check your credentials.';
+        throw new Error(message);
     }
-
-    return response.json();
 }
 
 export async function sendResetEmail(request: PasswordResetRequest): Promise<string> {
-    const response = await fetch(`${API_BASE_URL}/user/reset-password`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to send reset email. Please try again.');
+    try {
+        const { data } = await axios.post(
+            `${API_BASE_URL}/user/reset-password`,
+            request
+        );
+        return data;
+    } catch (error) {
+        const axiosError = error as AxiosError<{ message?: string }>;
+        const message = axiosError.response?.data?.message || 'Failed to send reset email. Please try again.';
+        throw new Error(message);
     }
-    return await response.text();
 }
-
 
 export async function resetPassword(request: PasswordResetConfirmationRequest): Promise<string> {
-    const response = await fetch(`${API_BASE_URL}/user/reset-password-confirmation`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to reset password. Please try again.');
+    try {
+        const { data } = await axios.post(
+            `${API_BASE_URL}/user/reset-password-confirmation`,
+            request
+        );
+        return data;
+    } catch (error) {
+        const axiosError = error as AxiosError<{ message?: string }>;
+        const message = axiosError.response?.data?.message || 'Failed to reset password. Please try again.';
+        throw new Error(message);
     }
-
-    return await response.text();
 }
-
-
-
