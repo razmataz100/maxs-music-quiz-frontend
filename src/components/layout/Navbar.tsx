@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import ProfileIcon from '../assets/profile.svg';
-import LogoutIcon from '../assets/logout.svg';
-import TrophyIcon from '../assets/trophy.svg';
-import { getProfilePictureUrl } from "../httpUtils/user.ts";
+import ProfileIcon from '../../assets/profile.svg';
+import TrophyIcon from '../../assets/trophy.svg';
+import LogoutIcon from '../../assets/logout.svg';
+import {getProfilePictureUrl} from "../../services/user.service.ts";
+import {clearAuthData, getAuthToken, getUsername} from "../../helpers/auth.helpers.ts";
+import {extractProfilePictureUrl} from "../../helpers/profile.helpers.ts";
 
 function Navbar() {
     const [username, setUsername] = useState<string | null>(null);
@@ -11,17 +13,24 @@ function Navbar() {
     const navigate = useNavigate();
     const location = useLocation();
     const isLoginPage = location.pathname === '/' || location.pathname === '/login';
-    const isLoggedIn = Boolean(localStorage.getItem('authToken')) && !isLoginPage;
+    const isLoggedIn = (() => {
+        try {
+            getAuthToken();
+            return !isLoginPage;
+        } catch {
+            return false;
+        }
+    })();
 
     useEffect(() => {
         if (isLoginPage) {
-            localStorage.clear();
+            clearAuthData();
         }
     }, [isLoginPage]);
 
     useEffect(() => {
         if (isLoggedIn) {
-            setUsername(localStorage.getItem('username'));
+            setUsername(getUsername());
             fetchProfilePicture();
 
             const handleProfileUpdate = () => {
@@ -42,12 +51,7 @@ function Navbar() {
     const fetchProfilePicture = async () => {
         try {
             const result = await getProfilePictureUrl();
-            if (result && result.imageUrl) {
-                const imageUrl = result.imageUrl;
-                setProfilePicUrl(imageUrl);
-            } else {
-                setProfilePicUrl(null);
-            }
+            setProfilePicUrl(extractProfilePictureUrl(result));
         } catch (error) {
             console.error('Failed to fetch profile picture:', error);
             setProfilePicUrl(null);
@@ -55,7 +59,7 @@ function Navbar() {
     };
 
     const handleLogout = () => {
-        localStorage.clear();
+        clearAuthData();
         setUsername(null);
         setProfilePicUrl(null);
         navigate('/');

@@ -1,12 +1,16 @@
 export interface GameWithHighScore {
     gameId: number;
     theme: string;
+    questionsAnswered?: number;
+    correctAnswers?: number;
+    username?: string;
     highScore?: number;
     highScoreUsername?: string;
     highScoreProfilePictureUrl?: string;
-    userHighScore?: number;
-    questionsAnswered?: number;
-    correctAnswers?: number;
+    highScoreDate?: string;
+    userHighScoreDate?: string;
+    userBestScore?: number;
+    userBestScoreQuestions?: number;
 }
 
 export interface CreateGameRequest {
@@ -23,4 +27,15 @@ export interface QuizQuestion {
     answerChoices: string[];
     correctAnswer: string;
     quizGameId: number;
+}
+
+export interface GameHistory {
+    gameId: number;
+    theme: string;
+    playedAt: string;
+    score: number;
+    totalQuestions: number;
+    username: string;
+    isCurrentUser: boolean;
+    profilePictureUrl?: string;
 }

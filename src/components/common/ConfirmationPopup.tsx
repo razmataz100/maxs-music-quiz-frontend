@@ -1,4 +1,3 @@
-// src/components/ConfirmationPopup.tsx
 import React from 'react';
 
 interface ConfirmationPopupProps {

@@ -1,14 +1,19 @@
 import { useEffect, useState, useRef } from 'react';
-import { getUserInfo, updateUserInfo, uploadProfilePicture, getProfilePictureUrl } from '../httpUtils/user';
-import {User} from "../types/user.ts";
+import {User} from "../../types/user.ts";
 import { useNavigate } from 'react-router-dom';
-import BackButton from "../components/BackButton.tsx";
-import {FormInput} from "../components/FormInput.tsx";
-import {StatCard} from "../components/StatCard.tsx";
-import {ProfilePicture} from "../components/ProfilePicture.tsx";
-import {Button} from "../components/Button.tsx";
-import {StatusMessage} from "../components/StatusMessage.tsx";
-import {LoadingSpinner} from "../components/LoadingSpinner.tsx";
+import BackButton from "../../components/common/BackButton.tsx";
+import {FormInput} from "../../components/common/FormInput.tsx";
+import {ProfilePicture} from "../../components/common/ProfilePicture.tsx";
+import {Button} from "../../components/common/Button.tsx";
+import {StatusMessage} from "../../components/common/StatusMessage.tsx";
+import {LoadingSpinner} from "../../components/common/LoadingSpinner.tsx";
+import {StatCard} from "../../components/profile/StatCard.tsx";
+import {getProfilePictureUrl, getUserInfo, updateUserInfo, uploadProfilePicture} from "../../services/user.service.ts";
+import {
+    dispatchProfilePictureUpdated,
+    extractProfilePictureUrl,
+    getInitialFormData
+} from "../../helpers/profile.helpers.ts";
 
 
 function Profile() {
@@ -35,10 +40,7 @@ function Profile() {
             const info = await getUserInfo();
             setUserInfo(info);
             if (info) {
-                setFormData({
-                    username: info.username,
-                    email: info.email
-                });
+                setFormData(getInitialFormData(info));
             }
         } catch (err) {
             setError((err as Error).message);
@@ -50,11 +52,7 @@ function Profile() {
     const fetchProfilePicture = async () => {
         try {
             const result = await getProfilePictureUrl();
-            if (result && result.imageUrl) {
-                setProfilePicUrl(result.imageUrl);
-            } else {
-                setProfilePicUrl(null);
-            }
+            setProfilePicUrl(extractProfilePictureUrl(result));
         } catch (error) {
             console.error('Failed to fetch profile picture:', error);
             setProfilePicUrl(null);
@@ -94,9 +92,7 @@ function Profile() {
             try {
                 await uploadProfilePicture(file);
                 await fetchProfilePicture();
-
-                const profileUpdatedEvent = new CustomEvent('profilePictureUpdated');
-                window.dispatchEvent(profileUpdatedEvent);
+                dispatchProfilePictureUpdated();
             } catch (error) {
                 console.error('Failed to upload profile picture:', error);
             } finally {

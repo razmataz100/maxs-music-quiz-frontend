@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import ProfileIcon from "../assets/profile.svg";
+import ProfileIcon from "../../assets/profile.svg";
 
 interface ProfilePictureProps {
     imageUrl: string | null;

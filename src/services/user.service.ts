@@ -1,7 +1,6 @@
 import axios, { AxiosError } from 'axios';
-import { RegisterRequest, RegisterResponse } from "../types/registerRequest.ts";
 import { API_BASE_URL } from "../config/apiConfig.ts";
-import { UpdateUserRequest, User } from "../types/user.ts";
+import {RegisterRequest, RegisterResponse, UpdateUserRequest, User} from "../types/user.ts";
 
 export async function register(request: RegisterRequest): Promise<RegisterResponse> {
     try {

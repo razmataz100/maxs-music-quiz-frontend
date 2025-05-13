@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { API_BASE_URL } from "../config/apiConfig";
-import { CreateGameRequest, GameWithHighScore, QuizQuestion } from "../types/game.ts";
+import {CreateGameRequest, GameHistory, GameWithHighScore, QuizQuestion} from "../types/game.ts";
 
 export async function startGame(gameId: number, authToken: string): Promise<QuizQuestion[]> {
     if (!authToken || !gameId) {
@@ -88,4 +88,15 @@ export async function deleteGame(gameId: number, authToken: string): Promise<voi
         const message = axiosError.response?.data?.message || 'Something went wrong, please try again.';
         throw new Error(message);
     }
+}
+
+export async function getGameHistory(gameId: number, userId: number, limit = 3): Promise<GameHistory[]> {
+    const token = localStorage.getItem('authToken');
+    if (!token) throw new Error('Authentication required');
+
+    const { data } = await axios.get(
+        `${API_BASE_URL}/game/${gameId}/history/${userId}?limit=${limit}`,
+        { headers: { 'Authorization': `Bearer ${token}` }}
+    );
+    return data;
 }

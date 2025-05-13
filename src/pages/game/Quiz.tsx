@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { endGame, startGame } from "../httpUtils/game.ts";
-import ConfirmationPopup from "../components/ConfirmationPopup.tsx";
-import {QuizQuestion} from "../types/game.ts";
-import {Button} from "../components/Button.tsx";
-import CloseIcon from "../assets/close.svg";
+import ConfirmationPopup from "../../components/common/ConfirmationPopup.tsx";
+import {QuizQuestion} from "../../types/game.ts";
+import {Button} from "../../components/common/Button.tsx";
+import CloseIcon from "../../assets/close.svg";
+import {endGame, startGame} from "../../services/game.service.ts";
+import {getAuthToken, getUserId} from "../../helpers/auth.helpers.ts";
+import {getAnswerButtonStyles} from "../../helpers/quiz.helpers.ts";
 
 function Quiz() {
     const { gameId } = useParams();
@@ -25,7 +27,7 @@ function Quiz() {
     useEffect(() => {
         const loadGame = async () => {
             try {
-                const authToken = localStorage.getItem("authToken");
+                const authToken = getAuthToken();
                 if (!authToken || !gameId) return;
 
                 setLoading(true);
@@ -45,8 +47,8 @@ function Quiz() {
         if (gameOver) {
             const finalizeGame = async () => {
                 try {
-                    const authToken = localStorage.getItem("authToken");
-                    const userId = Number(localStorage.getItem("userId"));
+                    const authToken = getAuthToken();
+                    const userId = getUserId();
                     if (!authToken || !gameId) return;
 
                     await endGame(Number(gameId), userId, correctAnswers, questions.length, authToken);
@@ -213,17 +215,7 @@ function Quiz() {
                         key={index}
                         onClick={() => handleAnswerSelect(answer)}
                         disabled={showResult}
-                        className={`p-3 rounded-lg text-base sm:text-lg font-medium transition-colors h-auto cursor-pointer ${
-                            showResult
-                                ? answer === currentQuestion.correctAnswer
-                                    ? "bg-green-500 text-white"
-                                    : selectedAnswer === answer
-                                        ? "bg-red-500 text-white"
-                                        : "bg-gray-100 text-gray-700"
-                                : selectedAnswer === answer
-                                    ? "bg-indigo-600 text-white"
-                                    : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                        }`}
+                        className={getAnswerButtonStyles(answer, currentQuestion.correctAnswer, selectedAnswer, showResult)}
                     >
                         {answer}
                     </button>

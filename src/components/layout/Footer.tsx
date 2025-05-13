@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import {getAuthToken} from "../../helpers/auth.helpers.ts";
 
 const Footer = () => {
     const navigate = useNavigate();
@@ -7,8 +8,12 @@ const Footer = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
-        const authToken = localStorage.getItem('authToken');
-        setIsLoggedIn(Boolean(authToken));
+        try {
+            getAuthToken();
+            setIsLoggedIn(true);
+        } catch {
+            setIsLoggedIn(false);
+        }
     }, [location.pathname]);
 
     return (

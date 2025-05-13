@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createGame } from '../httpUtils/game';
-import { CreateGameRequest } from '../types/game';
-import BackButton from "../components/BackButton.tsx";
-import {FormInput} from "../components/FormInput.tsx";
-import {Button} from "../components/Button.tsx";
+import { CreateGameRequest } from '../../types/game.ts';
+import BackButton from "../../components/common/BackButton.tsx";
+import {FormInput} from "../../components/common/FormInput.tsx";
+import {Button} from "../../components/common/Button.tsx";
+import {createGame} from "../../services/game.service.ts";
+import {getAuthToken} from "../../helpers/auth.helpers.ts";
 
 function CreateQuiz() {
     const [theme, setTheme] = useState('');
@@ -31,11 +32,7 @@ function CreateQuiz() {
         setIsSubmitting(true);
 
         try {
-            const authToken = localStorage.getItem('authToken');
-            if (!authToken) {
-                throw new Error('Authentication token is missing.');
-            }
-
+            const authToken = getAuthToken();
             const request: CreateGameRequest = { theme, playlistUrl };
             await createGame(request, authToken);
             setSuccessMessage('Quiz created successfully!');
