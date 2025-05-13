@@ -5,6 +5,7 @@ export interface GameWithHighScore {
     correctAnswers?: number;
     username?: string;
     highScore?: number;
+    highScoreQuestions?: number;
     highScoreUsername?: string;
     highScoreProfilePictureUrl?: string;
     highScoreDate?: string;
