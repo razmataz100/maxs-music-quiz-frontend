@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { endGame, startGame } from "../httpUtils/game.ts";
-import ConfirmationPopup from "../components/ConfirmationPopup.tsx";
-import {QuizQuestion} from "../types/game.ts";
-import {Button} from "../components/Button.tsx";
-import CloseIcon from "../assets/close.svg";
+import ConfirmationPopup from "../../components/common/ConfirmationPopup.tsx";
+import {QuizQuestion} from "../../types/game.ts";
+import {Button} from "../../components/common/Button.tsx";
+import CloseIcon from "../../assets/close.svg";
+import {endGame, startGame} from "../../services/game.service.ts";
+import {getAuthToken, getUserId} from "../../helpers/auth.helpers.ts";
+import {getAnswerButtonStyles} from "../../helpers/quiz.helpers.ts";
 
 function Quiz() {
     const { gameId } = useParams();
@@ -18,13 +20,14 @@ function Quiz() {
     const [correctAnswers, setCorrectAnswers] = useState(0);
     const [gameOver, setGameOver] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [playerKey, setPlayerKey] = useState(0);
     const [showConfirmLeave, setShowConfirmLeave] = useState(false);
-    const [timerStarted, setTimerStarted] = useState(false);
+
 
     useEffect(() => {
         const loadGame = async () => {
             try {
-                const authToken = localStorage.getItem("authToken");
+                const authToken = getAuthToken();
                 if (!authToken || !gameId) return;
 
                 setLoading(true);
@@ -44,8 +47,8 @@ function Quiz() {
         if (gameOver) {
             const finalizeGame = async () => {
                 try {
-                    const authToken = localStorage.getItem("authToken");
-                    const userId = Number(localStorage.getItem("userId"));
+                    const authToken = getAuthToken();
+                    const userId = getUserId();
                     if (!authToken || !gameId) return;
 
                     await endGame(Number(gameId), userId, correctAnswers, questions.length, authToken);
@@ -59,7 +62,7 @@ function Quiz() {
     }, [gameOver, gameId, correctAnswers]);
 
     useEffect(() => {
-        if (gameOver || showResult || !questions.length || loading || !timerStarted) return;
+        if (gameOver || showResult || !questions.length || loading) return;
 
         const timer = setInterval(() => {
             setTimeRemaining((prev) => {
@@ -73,19 +76,14 @@ function Quiz() {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [currentQuestionIndex, showResult, gameOver, questions.length, loading, timerStarted]);
+    }, [currentQuestionIndex, showResult, gameOver, questions.length, loading]);
 
     useEffect(() => {
-        setTimerStarted(false);
-        setTimeRemaining(30);
+        setPlayerKey((prevKey) => prevKey + 1);
     }, [currentQuestionIndex]);
 
-    const handleStartTimer = () => {
-        setTimerStarted(true);
-    };
-
     const handleAnswerSelect = (answer: string) => {
-        if (showResult || !timerStarted) return;
+        if (showResult) return;
 
         setSelectedAnswer(answer);
 
@@ -102,6 +100,7 @@ function Quiz() {
     const handleNextQuestion = () => {
         if (currentQuestionIndex < questions.length - 1) {
             setCurrentQuestionIndex((prev) => prev + 1);
+            setTimeRemaining(30);
             setSelectedAnswer(null);
             setShowResult(false);
         } else {
@@ -170,7 +169,8 @@ function Quiz() {
     const currentQuestion = questions[currentQuestionIndex];
 
     return (
-        <div className="p-5 sm:p-10 bg-white border border-gray-200 shadow-md w-full max-w-4xl mx-auto rounded-lg flex flex-col h-full max-h-screen overflow-hidden">
+        <div
+            className="p-5 sm:p-10 bg-white border border-gray-200 shadow-md w-full max-w-4xl mx-auto rounded-lg flex flex-col h-full max-h-screen overflow-hidden">
             <div className="relative flex justify-center items-center mb-4">
                 <Button
                     variant="secondary"
@@ -187,7 +187,7 @@ function Quiz() {
             <div className="flex flex-col sm:flex-row justify-between items-center mb-3 mt-8">
                 <div className="text-base sm:text-lg font-bold text-gray-800 mb-1 sm:mb-0">Score: {correctAnswers}</div>
                 <div className="text-base sm:text-lg font-bold text-indigo-600 mb-1 sm:mb-0">
-                    Time: {timerStarted ? `${timeRemaining}s` : '--'}
+                    Time: {timeRemaining}s
                 </div>
                 <div className="text-base sm:text-lg font-bold text-gray-800">
                     Question {currentQuestionIndex + 1}/{questions.length}
@@ -201,22 +201,11 @@ function Quiz() {
             <div className="flex justify-center mb-4">
                 <div className="relative w-full sm:w-3/4">
                     <iframe
-                        src={`https://open.spotify.com/embed/track/${currentQuestion.spotifyTrackId}?utm_source=generator&theme=0`}
+                        key={playerKey}
+                        src={`https://open.spotify.com/embed/track/${currentQuestion.spotifyTrackId}?utm_source=generator&theme=0&autoplay=1`}
                         loading="lazy"
-                        className="w-full h-20 rounded-lg"
+                        className="w-full h-20"
                     />
-                    {!timerStarted && (
-                        <div className="mt-2 text-center">
-                            <Button
-                                variant="primary"
-                                onClick={handleStartTimer}
-                                className="bg-green-500 hover:bg-green-600"
-                            >
-                                Start Timer (After Playing Song)
-                            </Button>
-                            <p className="text-sm text-gray-600 mt-1">Click play above, then start the timer</p>
-                        </div>
-                    )}
                 </div>
             </div>
 
@@ -225,20 +214,8 @@ function Quiz() {
                     <button
                         key={index}
                         onClick={() => handleAnswerSelect(answer)}
-                        disabled={showResult || !timerStarted}
-                        className={`p-3 rounded-lg text-base sm:text-lg font-medium transition-colors h-auto cursor-pointer ${
-                            showResult
-                                ? answer === currentQuestion.correctAnswer
-                                    ? "bg-green-500 text-white"
-                                    : selectedAnswer === answer
-                                        ? "bg-red-500 text-white"
-                                        : "bg-gray-100 text-gray-700"
-                                : selectedAnswer === answer
-                                    ? "bg-indigo-600 text-white"
-                                    : timerStarted
-                                        ? "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                        }`}
+                        disabled={showResult}
+                        className={getAnswerButtonStyles(answer, currentQuestion.correctAnswer, selectedAnswer, showResult)}
                     >
                         {answer}
                     </button>

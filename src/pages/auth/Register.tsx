@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {RegisterRequest, RegisterResponse} from "../types/registerRequest.ts";
-import {register} from "../httpUtils/user.ts";
+import {RegisterRequest, RegisterResponse} from "../../types/user.ts";
+import {register} from "../../services/user.service.ts";
 
 
 function Register() {

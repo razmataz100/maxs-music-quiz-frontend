@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { LoginRequest } from '../types/auth';
-import {useNavigate} from "react-router-dom";
-import {login} from "../httpUtils/auth.ts";
+import { useNavigate } from "react-router-dom";
+import { login } from "../../services/auth.service";
+import {LoginRequest} from "../../types/auth.ts";
+import {clearAuthData, saveAuthData} from "../../helpers/auth.helpers.ts";
 
-function Login({ onLoginSuccess }: { onLoginSuccess: () => void }) {
+function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -11,7 +12,7 @@ function Login({ onLoginSuccess }: { onLoginSuccess: () => void }) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        localStorage.clear();
+        clearAuthData();
     }, []);
 
     const handleLogin = async () => {
@@ -26,14 +27,9 @@ function Login({ onLoginSuccess }: { onLoginSuccess: () => void }) {
         try {
             const request: LoginRequest = { username, password };
             const response = await login(request);
+            saveAuthData(response);
 
-            localStorage.setItem('authToken', response.token);
-            localStorage.setItem('tokenExpiration', response.expiration);
-            localStorage.setItem('username', response.username);
-            localStorage.setItem('userId', response.userId.toString());
-            localStorage.setItem('userRole', response.userRole);
-
-            onLoginSuccess();
+            navigate('/home');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
         } finally {

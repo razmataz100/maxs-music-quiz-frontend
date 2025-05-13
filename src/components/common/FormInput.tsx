@@ -28,7 +28,7 @@ export const FormInput: FC<FormInputProps> = ({
             </label>
             <input
                 id={id}
-                name={id}  // Important! This must match the property name in formData
+                name={id}
                 type={type}
                 value={value}
                 onChange={onChange}

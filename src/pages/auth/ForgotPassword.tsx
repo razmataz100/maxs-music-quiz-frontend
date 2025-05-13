@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { PasswordResetConfirmationRequest, PasswordResetRequest } from "../types/resetPassword.ts";
-import { resetPassword, sendResetEmail } from "../httpUtils/auth.ts";
+import { PasswordResetConfirmationRequest, PasswordResetRequest } from "../../types/resetPassword.ts";
 import { useNavigate } from 'react-router-dom';
+import {resetPassword, sendResetEmail} from "../../services/auth.service.ts";
 
 function ForgotPassword() {
     const [email, setEmail] = useState('');

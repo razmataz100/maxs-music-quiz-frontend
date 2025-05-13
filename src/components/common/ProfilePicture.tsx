@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import ProfileIcon from "../assets/profile.svg";
+import ProfileIcon from "../../assets/profile.svg";
 
 interface ProfilePictureProps {
     imageUrl: string | null;
@@ -7,7 +7,7 @@ interface ProfilePictureProps {
     onClick?: () => void;
     showEditIcon?: boolean;
     className?: string;
-    baseUrl?: string; // Add optional baseUrl prop
+    baseUrl?: string;
 }
 
 export const ProfilePicture: FC<ProfilePictureProps> = ({
@@ -16,7 +16,7 @@ export const ProfilePicture: FC<ProfilePictureProps> = ({
                                                             onClick,
                                                             showEditIcon = false,
                                                             className = "w-24 h-24",
-                                                            baseUrl = "" // Default to empty string
+                                                            baseUrl = ""
                                                         }) => {
     const fullImageUrl = imageUrl
         ? (baseUrl && !imageUrl.startsWith('http') ? `${baseUrl}${imageUrl}` : imageUrl)
@@ -29,14 +29,14 @@ export const ProfilePicture: FC<ProfilePictureProps> = ({
         >
             {uploading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"></div>
                 </div>
             )}
             {fullImageUrl ? (
                 <img
                     src={fullImageUrl}
                     alt="Profile"
-                    className={`${className} rounded-full object-cover border-2 border-indigo-600`}
+                    className={`${className} rounded-full object-cover border-2 border-transparent`}
                     onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.onerror = null;

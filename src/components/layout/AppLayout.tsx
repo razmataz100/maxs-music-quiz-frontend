@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
+import Navbar from "./Navbar.tsx";
+import Footer from "./Footer.tsx";
 
 interface AppLayoutProps {
     children: ReactNode;

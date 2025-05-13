@@ -15,3 +15,4 @@ export interface LoginResponse {
     username: string;
     userRole: UserRole;
 }
+
