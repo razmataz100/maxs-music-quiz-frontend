@@ -9,7 +9,7 @@ export async function startGame(gameId: number, authToken: string): Promise<Quiz
 
     try {
         const { data } = await axios.post<QuizQuestion[]>(
-            `${API_BASE_URL}/game/${gameId}/start-game`,
+            `${API_BASE_URL}/game/${gameId}/start`,
             null,
             {
                 headers: { 'Authorization': `Bearer ${authToken}` }
@@ -42,7 +42,7 @@ export async function getAllGames(userId: number, authToken: string): Promise<Ga
 export async function endGame(gameId: number, userId: number, correctAnswers: number, questionsAnswered: number, authToken: string): Promise<void> {
     try {
         await axios.post(
-            `${API_BASE_URL}/game/${gameId}/end-game`,
+            `${API_BASE_URL}/game/${gameId}/end`,
             {
                 userId: userId,
                 correctAnswers: correctAnswers,

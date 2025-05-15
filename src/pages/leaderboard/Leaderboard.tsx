@@ -63,7 +63,7 @@ function Leaderboard() {
                     </div>
                     <div>
                         <span className="text-gray-600">Average:</span>
-                        <span className="ml-2 font-bold text-blue-900">{userRanking.averageScore}%</span>
+                        <span className="ml-2 font-bold text-blue-900">{userRanking.averageScore.toFixed(2)}%</span>
                     </div>
                     <div>
                         <span className="text-gray-600">Games:</span>

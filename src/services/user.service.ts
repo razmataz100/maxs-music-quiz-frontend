@@ -28,7 +28,7 @@ export async function uploadProfilePicture(file: File): Promise<{imageUrl: strin
 
     try {
         const { data } = await axios.post<{imageUrl: string}>(
-            `${API_BASE_URL}/user/upload-profile-picture`,
+            `${API_BASE_URL}/user/profile/picture`,
             formData,
             {
                 headers: {
@@ -54,7 +54,7 @@ export async function getProfilePictureUrl(): Promise<{ imageUrl: string } | nul
 
     try {
         const response = await axios.get(
-            `${API_BASE_URL}/user/profile-picture`,
+            `${API_BASE_URL}/user/profile/picture`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -84,7 +84,7 @@ export async function getUserInfo(): Promise<User | null> {
 
     try {
         const { data } = await axios.get<User>(
-            `${API_BASE_URL}/user/user-info`,
+            `${API_BASE_URL}/user/profile`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -107,7 +107,7 @@ export async function updateUserInfo(request: UpdateUserRequest): Promise<User> 
 
     try {
         const { data } = await axios.put<User>(
-            `${API_BASE_URL}/user/update`,
+            `${API_BASE_URL}/user/profile`,
             request,
             {
                 headers: {
